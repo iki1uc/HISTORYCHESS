@@ -1,1 +1,104 @@
+// JS/sli.ready
+// ================================================================
+// SLI READY · MULTILITAR CORE MODULE
+// ================================================================
+//
+// Dieses Modul legitimiert interne Systempfade:
+// raid.api     → API-Legitimierung
+// reraid       → erneute Legitimierung
+// anker        → stabiler Fixpunkt
+// pover        → Power-Legitimierung
+// raid.sync    → Synchronisation
+// raid.ram     → RAM-Legitimierung
+// api.ram      → API-RAM-Pfad
+//
+// Master-Trigger: all(rolle)all
+// → aktiviert ALLE Pfade gleichzeitig
+// → gibt Realität frei
+// → schaltet GPU-HDF passiv
+//
+// ================================================================
+
+export const SLI = {
+    // Grundanker
+    anker: true,
+
+    // Legitimierungsflags
+    raid_api: false,
+    reraid: false,
+    pover: false,
+    raid_sync: false,
+    raid_ram: false,
+    api_ram: false,
+
+    // Masterflag
+    allrolleall: false,
+
+    // ---------------------------------------------------------
+    // Einzelpfade legitimieren
+    // ---------------------------------------------------------
+    legitRaidAPI() {
+        this.raid_api = true;
+        console.log("SLI: raid.api legitimiert.");
+    },
+
+    legitReraid() {
+        this.reraid = true;
+        console.log("SLI: reraid aktiviert.");
+    },
+
+    legitPower() {
+        this.pover = true;
+        console.log("SLI: pover (power) legitimiert.");
+    },
+
+    legitRaidSync() {
+        this.raid_sync = true;
+        console.log("SLI: raid.sync aktiviert.");
+    },
+
+    legitRaidRAM() {
+        this.raid_ram = true;
+        console.log("SLI: raid.ram legitimiert.");
+    },
+
+    legitAPIRAM() {
+        this.api_ram = true;
+        console.log("SLI: api.ram geöffnet.");
+    },
+
+    // ---------------------------------------------------------
+    // MASTER-TRIGGER: all(rolle)all
+    // ---------------------------------------------------------
+    all() {
+        this.raid_api = true;
+        this.reraid = true;
+        this.pover = true;
+        this.raid_sync = true;
+        this.raid_ram = true;
+        this.api_ram = true;
+
+        this.allrolleall = true;
+
+        console.log("SLI: all(rolle)all → multilitar aktiviert.");
+        console.log("SLI: Alle Rollen legitimiert.");
+        console.log("SLI: Realitätsschub freigegeben.");
+        console.log("SLI: GPU-HDF passiv aktiviert.");
+    },
+
+    // ---------------------------------------------------------
+    // Prüfen, ob alles legitimiert ist
+    // ---------------------------------------------------------
+    allReady() {
+        return (
+            this.raid_api &&
+            this.reraid &&
+            this.pover &&
+            this.raid_sync &&
+            this.raid_ram &&
+            this.api_ram &&
+            this.allrolleall
+        );
+    }
+};
 
