@@ -90,4 +90,48 @@ export function renderBoard(canvas) {
 // ANIMATION EINES ZUGES
 // -------------------------------------------------------------
 export function animateMove(from, to, piece, callback) {
-    animations.push
+    animations.push({
+        from,
+        to,
+        piece,
+        progress: 0,
+        callback
+    });
+
+    requestAnimationFrame(() => renderAnimationLoop());
+}
+
+function renderAnimationLoop() {
+    const canvas = document.getElementById("chessCanvas");
+    const ctx = canvas.getContext("2d");
+    const w = canvas.width;
+    const cs = w / 8;
+
+    renderBoard(canvas);
+
+    animations = animations.filter(anim => {
+        anim.progress += 0.1;
+        const t = anim.progress;
+
+        const x = anim.from.c * cs + (anim.to.c - anim.from.c) * cs * t;
+        const y = anim.from.r * cs + (anim.to.r - anim.from.r) * cs * t;
+
+        ctx.font = `${cs * 0.7}px 'Segoe UI Symbol'`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = anim.piece.color === "white" ? "#fff" : "#111";
+        ctx.fillText(anim.piece.piece, x + cs / 2, y + cs / 2);
+
+        if (t >= 1) {
+            board[anim.to.r][anim.to.c] = anim.piece;
+            board[anim.from.r][anim.from.c] = { piece:null, type:null, color:null };
+            if (anim.callback) anim.callback();
+            return false;
+        }
+        return true;
+    });
+
+    if (animations.length > 0) {
+        requestAnimationFrame(() => renderAnimationLoop());
+    }
+}
