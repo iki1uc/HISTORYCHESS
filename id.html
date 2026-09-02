@@ -1,0 +1,21 @@
+<!-- CLOSED · NO‑CLONE · BUSINESS -->
+
+export function ID_2our(vec) {
+    const mag = Math.sqrt(vec.x**2 + vec.y**2 + vec.z**2);
+
+    return {
+        mode: "vector-id",
+        identity: "Gentleman-6D · Alpha",
+        overclock: "12D-Boost",
+        history: {
+            QI: "Moment-Intensität",
+            IQQ: "Kontext-Lage"
+        },
+        magnitude: mag,
+        direction: {
+            x: vec.x / mag,
+            y: vec.y / mag,
+            z: vec.z / mag
+        }
+    };
+}

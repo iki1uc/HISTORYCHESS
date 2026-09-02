@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⭐ 3‑STERNE · GENERAL · CHESS · ATMOSPHERIC</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: #0a0a12;
+            color: #d0d9e6;
+            font-family: 'Consolas', monospace;
+            padding: 10px;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 30% 40%, #0a0a20, #000);
+        }
+        h1 {
+            text-align: center;
+            letter-spacing: 3px;
+            font-weight: 300;
+            font-size: 22px;
+            background: linear-gradient(90deg, #ffd700, #00ccff, #ff66ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+        h1 small {
+            font-size: 10px;
+            display: block;
+            color: #3d5a70;
+            -webkit-text-fill-color: #3d5a70;
+            letter-spacing: 2px;
+        }
+        .container { max-width:1400px; margin:0 auto; }
+        .flex { display:flex; flex-wrap:wrap; gap:4px; align-items:center; margin:3px 0; }
+        .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+        @media(max-width:1100px){ .grid3 { grid-template-columns:1fr 1fr; } }
+        @media(max-width:700px){ .grid3 { grid-template-columns:1fr; } }
+
+        .panel {
+            background: rgba(255,255,255,0.03);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(0,200,255,0.08);
+        }
+        .panel h3 {
+            font-size: 10px;
+            color: #3d5a70;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        button {
+            background: #0f0;
+            color: #000;
+            font-weight: bold;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover { background: #0ff; }
+        button.sec { background:transparent; color:#0f0; border:1px solid #0f0; }
+        button.sec:hover { background:#0f0; color:#000; }
+        button.gold { background:#ffd700; color:#000; }
+        button.gold:hover { background:#ffaa00; }
+        button.ice { color:#4fc3f7; border:1px solid rgba(79,195,247,0.2); background:transparent; }
+        button.ice:hover { background:rgba(79,195,247,0.1); }
+        button.water { color:#4dd0e1; border:1px solid rgba(77,208,225,0.2); background:transparent; }
+        button.water:hover { background:rgba(77,208,225,0.1); }
+        button.fire { color:#ff7043; border:1px solid rgba(255,112,67,0.2); background:transparent; }
+        button.fire:hover { background:rgba(255,112,67,0.1); }
+
+        .axle-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 2px;
+            margin: 3px 0;
+        }
+        .axle-cell {
+            background: #0a0a0a;
+            padding: 3px;
+            text-align: center;
+            font-size: 7px;
+            border: 1px solid #111;
+            border-radius: 2px;
+            color: #3d5a70;
+            cursor: pointer;
+        }
+        .axle-cell.on { background:#0a2a1a; color:#6bffa9; border-color:#0f0; }
+        .axle-cell.off { background:#0a0a0a; color:#3d5a70; }
+
+        .status-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            font-size: 9px;
+            margin: 3px 0;
+            color: #5a7a8a;
+        }
+        .status-row span {
+            background: rgba(255,255,255,0.02);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .console {
+            background: #0a0a0a;
+            padding: 6px;
+            border-radius: 4px;
+            font-size: 7px;
+            color: #3d5a70;
+            max-height: 80px;
+            overflow-y: auto;
+            border: 1px solid #111;
+        }
+        .console .log-ok { color:#6bffa9; }
+        .console .log-warn { color:#ffd700; }
+        .console .log-info { color:#66ccff; }
+        .console .log-err { color:#ff6b8a; }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 4px;
+            margin: 4px 0;
+        }
+        .metric {
+            background: #0a0a0a;
+            padding: 6px;
+            border-radius: 4px;
+            text-align: center;
+            border: 1px solid #1a1a2a;
+        }
+        .metric .label { font-size:7px; color:#3d5a70; text-transform:uppercase; }
+        .metric .value { font-size:16px; font-weight:bold; color:#6bffa9; }
+        .metric .value.gold { color:#ffd700; }
+        .metric .value.info { color:#66ccff; }
+
+        .board-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
+            aspect-ratio: 1/1;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(255,215,0,0.05);
+            overflow: hidden;
+        }
+        #atmoCanvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        #chessCanvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+        .badge {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 8px;
+            margin: 0 2px;
+        }
+        .badge.info { background:#0a1a2a; color:#66ccff; }
+
+        .footer {
+            text-align: center;
+            margin-top: 14px;
+            color: #1a1a1a;
+            font-size: 8px;
+            letter-spacing: 2px;
+            border-top: 1px solid rgba(255,255,255,0.01);
+            padding-top: 10px;
+        }
+        .footer span { color: #ffd700; opacity: 0.3; }
+
+        @keyframes floatUp {
+            0% { opacity:0.8; transform:translateY(0) scale(1); }
+            100% { opacity:0; transform:translateY(-80px) scale(0.5); }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>⭐ 3‑STERNE · GENERAL · CHESS · ATMOSPHERIC</h1>
+    <h1 style="font-size:11px;margin-top:-2px;background:none;-webkit-text-fill-color:#3d5a70;color:#3d5a70;font-weight:400">
+        PREFETCH · PREDICT · CACHE · VEREINHEITLICHT · ATMOSPHERE · CHESS
+    </h1>
+
+    <div class="grid3">
+
+        <!-- LINKES PANEL: General Engine -->
+        <div>
+            <div class="panel">
+                <h3>🎯 INDUSTRY · STEUERUNG</h3>
+                <div class="flex">
+                    <button class="gold" id="btnGeneral">⚡ GENERAL RUN</button>
+                    <button id="btnReset">⟲ RESET</button>
+                    <button class="sec" id="btnToggleAll">🔄 ALL TOGGLE</button>
+                    <button id="btnRandom">🎲 RANDOM</button>
+                    <button id="btnPump">💨 PUMP</button>
+                    <button id="btnLoop">♾ LOOP ALL</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>🌀 9 ACHSEN · d e i n o r s u w</h3>
+                <div class="axle-grid" id="axleGrid"></div>
+            </div>
+
+            <div class="panel">
+                <h3>🔷 PUMP · STATIONEN</h3>
+                <div class="flex" style="font-size:8px;color:#5a7a8a;gap:2px">
+                    <span class="badge info">HY</span><span class="badge info">PE</span>
+                    <span class="badge info">PER</span><span class="badge info">DA</span>
+                    <span class="badge info">NE</span><span class="badge info">BEN</span>
+                    <span class="badge info">TRANS</span><span class="badge info">WARB</span>
+                    <span class="badge info">KANAL</span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>📊 STATUS</h3>
+                <div class="status-row">
+                    <span>SCORE: <span id="scoreVal" style="color:#ffd700">0</span></span>
+                    <span>PUMP: <span id="pumpVal" style="color:#6bffa9">0</span></span>
+                    <span>QUOTE: <span id="quoteVal" style="color:#66ccff">0%</span></span>
+                    <span>PREDICT: <span id="predictVal" style="color:#ffd700">IDLE</span></span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>🧠 CPU PREDICTIVE · SPRUNG</h3>
+                <div class="flex" style="font-size:8px;gap:6px">
+                    <span>STATUS: <span id="cpuStatus" style="color:#6bffa9">ACTIVE</span></span>
+                    <span>BIAS: <span id="cpuBias" style="color:#ffd700">FORWARD</span></span>
+                    <span>SPRUNG: <span id="cpuJump" style="color:#ff6b8a">0</span></span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>📜 CONSOLE · LOG</h3>
+                <div class="console" id="consoleLog">⏳ system initialisiert...</div>
+            </div>
+        </div>
+
+        <!-- MITTLERES PANEL: Schachbrett + AtmoBoard -->
+        <div>
+            <div class="panel">
+                <h3>♟️ CHESS · ATMOSPHERIC</h3>
+                <div class="board-wrap" id="boardWrap">
+                    <canvas id="atmoCanvas"></canvas>
+                    <canvas id="chessCanvas"></canvas>
+                </div>
+                <div class="flex" style="margin-top:6px; justify-content:center;">
+                    <button class="ice" id="btnIce">❄️ Ice</button>
+                    <button class="water" id="btnWater">💧 Water</button>
+                    <button class="fire" id="btnFire">🔥 Fire</button>
+                    <button id="btnStep">⏭ Zug</button>
+                    <button id="btnAuto">▶ Auto</button>
+                    <button id="btnResetBoard">⟲ Reset Board</button>
+                </div>
+                <div class="status-row">
+                    <div class="turn">Zug: <span id="turnIndicator">Weiß</span></div>
+                    <div>Zug <span id="moveCount">0</span>/<span id="totalMoves">0</span></div>
+                    <div>🌀 <span id="manaIndicator">0</span></div>
+                    <div style="color:#445555;">⚡ <span id="agentStatus">bereit</span></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>📊 3 ANZEIGEN · PREFETCH · PREDICT · CACHE</h3>
+                <div class="metric-grid">
+                    <div class="metric">
+                        <div class="label">📦 PREFETCH</div>
+                        <div class="value" id="prefetchCount">0</div>
+                    </div>
+                    <div class="metric">
+                        <div class="label">🧠 PREDICT</div>
+                        <div class="value gold" id="predictCount">0</div>
+                    </div>
+                    <div class="metric">
+                        <div class="label">💾 CACHE</div>
+                        <div class="value info" id="cacheCount">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECHTES PANEL: Mystery + Fenster + Tüftel -->
+        <div>
+            <div class="panel">
+                <h3>❓ MYSTERY ACHSEN · Q / D / F</h3>
+                <div class="flex" style="font-size:8px;gap:6px">
+                    <span>Q: <span id="qVal" style="color:#66ccff">0</span></span>
+                    <span>D: <span id="dVal" style="color:#6bffa9">0</span></span>
+                    <span>F: <span id="fVal" style="color:#ffd700">0</span></span>
+                    <span style="color:#3d5a70">|</span>
+                    <span>ROOT: <span id="rootVal" style="color:#6bffa9">0</span></span>
+                    <span>ACHSE: <span id="achseVal" style="color:#66ccff">A</span></span>
+                    <span>TMP: <span id="tmpVal" style="color:#ffd700">128</span></span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>🔄 3×2 FENSTER · LIVE</h3>
+                <div id="liveWindow" style="display:grid;grid-template-columns:1fr 1fr;gap:2px;"></div>
+            </div>
+
+            <div class="panel">
+                <h3>🎛️ TÜFTEL · STEERING</h3>
+                <div style="display:flex;flex-direction:column;gap:4px;font-size:8px;">
+                    <div class="flex"><span style="width:70px;">⏱️ Speed</span>
+                        <input type="range" id="speedSlider" min="200" max="1500" value="700" step="50" style="flex:1;">
+                        <span id="speedDisplay" style="width:50px;">700ms</span>
+                    </div>
+                    <div class="flex"><span style="width:70px;">🎯 Stil</span>
+                        <select id="styleSelect" style="background:#1a1a2a;color:#d0d9e6;border:1px solid #2a2a3a;border-radius:4px;padding:2px;flex:1;">
+                            <option value="random">🎲 Zufall</option>
+                            <option value="aggressive">🔥 Aggressiv</option>
+                            <option value="defensive">🛡️ Defensiv</option>
+                            <option value="tactical">🧠 Taktisch</option>
+                        </select>
+                    </div>
+                    <div class="flex"><span style="width:70px;">💪 Stärke</span>
+                        <input type="range" id="strengthSlider" min="1" max="5" value="3" step="1" style="flex:1;">
+                        <span id="strengthDisplay" style="width:30px;">3</span>
+                    </div>
+                    <div class="flex" style="gap:4px;">
+                        <button class="sec" id="btnGood" style="flex:1;">👍 Gut</button>
+                        <button class="sec" id="btnBad" style="flex:1;">👎 Schlecht</button>
+                        <button id="btnLearn" style="flex:1;">🧬 Lernen</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>📈 MASSNAHME · ERGEBNISSE</h3>
+                <pre id="resultDisplay" style="background:rgba(0,0,0,0.4);padding:8px;border-radius:6px;font-size:9px;line-height:1.3;color:#8ab4c8;max-height:100px;overflow:auto;">⏳ berechne...</pre>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer"><span>♟️</span> 3‑STERNE · GENERAL · CHESS · ATMOSPHERIC · <span>wieimmer4u</span></div>
+</div>
+
+<script>
+// ================================================================
+// BAUSTEIN 0: ATMOSPHERIC BOARD (AtmoBoard)
+// ================================================================
+class AtmoBoard {
+    constructor(canvas, boardSize = 8) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.boardSize = boardSize;
+        this.cellSize = canvas.width / boardSize;
+        this.angle = 0;
+        this.particles = [];
+        this.lines = [];
+        this.colors = { light: { r: 60, g: 80, b: 100 }, dark: { r: 30, g: 50, b: 60 } };
+        this.mood = 'neon';
+        this.running = true;
+        this.initLines();
+    }
+
+    initLines() {
+        this.lines = [];
+        for (let i=0; i<15; i++) {
+            const start = { x: Math.random()*this.canvas.width, y: Math.random()*this.canvas.height };
+            const end = { x: Math.random()*this.canvas.width, y: Math.random()*this.canvas.height };
+            this.lines.push({
+                start, end,
+                progress: Math.random(),
+                speed: 0.002 + Math.random()*0.005,
+                width: 0.5 + Math.random()*1.5,
+                color: `rgba(100,200,255,${0.05+Math.random()*0.1})`
+            });
+        }
+    }
+
+    setMood(mood) {
+        this.mood = mood;
+        const colors = {
+            cool:   { light: {r:40,g:80,b:140}, dark: {r:20,g:40,b:80} },
+            warm:   { light: {r:200,g:120,b:60}, dark: {r:120,g:60,b:30} },
+            golden: { light: {r:255,g:215,b:0}, dark: {r:180,g:140,b:0} },
+            neon:   { light: {r:0,g:255,b:200}, dark: {r:0,g:150,b:120} }
+        };
+        this.colors = colors[mood] || colors.neon;
+    }
+
+    resize(width, height) {
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.cellSize = width / this.boardSize;
+        this.initLines();
+    }
+
+    draw() {
+        const ctx = this.ctx, w=this.canvas.width, h=this.canvas.height, cs=this.cellSize;
+        ctx.fillStyle = `rgba(0,0,0,${0.3+0.1*(0.5+Math.sin(this.angle)*0.2)})`;
+        ctx.fillRect(0,0,w,h);
+
+        for (const line of this.lines) {
+            const p = (line.progress + this.angle * line.speed) % 1;
+            const x1 = line.start.x + (line.end.x-line.start.x)*p;
+            const y1 = line.start.y + (line.end.y-line.start.y)*p;
+            const x2 = line.start.x + (line.end.x-line.start.x)*((p+0.15)%1);
+            const y2 = line.start.y + (line.end.y-line.start.y)*((p+0.15)%1);
+            ctx.beginPath();
+            ctx.moveTo(x1,y1);
+            ctx.lineTo(x2,y2);
+            ctx.strokeStyle = line.color;
+            ctx.lineWidth = line.width;
+            ctx.stroke();
+        }
+
+        for (let r=0; r<this.boardSize; r++) {
+            for (let c=0; c<this.boardSize; c++) {
+                const x=c*cs, y=r*cs;
+                const light=(r+c)%2===0;
+                const color=light?this.colors.light:this.colors.dark;
+                const df = Math.sin(r*0.5+c*0.3+this.angle*0.5)*0.15+0.85;
+                ctx.fillStyle = `rgba(${Math.floor(color.r*df)},${Math.floor(color.g*df)},${Math.floor(color.b*df)},0.25)`;
+                ctx.fillRect(x,y,cs,cs);
+                ctx.strokeStyle = `rgba(${color.r+20},${color.g+20},${color.b+30},0.05)`;
+                ctx.lineWidth = 0.5;
+                ctx.strokeRect(x,y,cs,cs);
+            }
+        }
+
+        if (Math.random() > 0.94) {
+            this.particles.push({
+                x:Math.random()*w, y:Math.random()*h,
+                vx:(Math.random()-0.5)*0.5, vy:(Math.random()-0.5)*0.5,
+                life:1, size:1+Math.random()*2,
+                color:`rgba(100,200,255,${0.1+Math.random()*0.3})`
+            });
+        }
+        this.particles = this.particles.filter(p => {
+            p.x+=p.vx; p.y+=p.vy; p.life-=0.003;
+            if (p.life<=0) return false;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size*p.life, 0, Math.PI*2);
+            ctx.fill();
+            return true;
+        });
+        this.angle += 0.008;
+    }
+
+    start() { this.running=true; this.loop(); }
+    loop() { if(!this.running) return; this.draw(); requestAnimationFrame(()=>this.loop()); }
+    stop() { this.running=false; }
+}
+
+// ================================================================
+// BAUSTEIN 1: GENERAL ENGINE (3‑Sterne)
+// ================================================================
+const engine = {
+    state: {
+        score:1000, pump:0, quote:0.5, predict:'IDLE',
+        cpuJump:0, cpuBias:'FORWARD', root:0, achse:'A', tmp:128,
+        q:27, d:81, f:243,
+        prefetchCount:0, predictCount:0, cacheCount:0
+    },
+    axles: 'deinorsuw'.split('').map(ch=>({name:ch,active:false})),
+    stations: ['HY','PE','PER','DA','NE','BEN','TRANS','WARB','KANAL'],
+    prefetch: [[3,9],[27,81],[243,729]],
+    liveWindow: [['3','9'],['27','81'],['243','729']],
+    memory: { hits:0, misses:0, slides:[], jumps:[] },
+
+    log(msg, type='info') {
+        const el = document.getElementById('consoleLog');
+        const t = new Date().toLocaleTimeString();
+        const cls = type==='ok'?'log-ok':type==='warn'?'log-warn':type==='err'?'log-err':'log-info';
+        el.innerHTML += `<div class="${cls}">[${t}] ${msg}</div>`;
+        el.scrollTop = el.scrollHeight;
+        if (el.children.length > 30) el.removeChild(el.firstChild);
+    },
+
+    sync() {
+        const active = this.axles.filter(a=>a.active).length;
+        const s = this.state;
+        s.root = active;
+        s.achse = active>0 ? String.fromCharCode(64+active) : '0';
+        s.tmp = 128 - s.pump;
+        s.q = 3*active + (s.pump%7);
+        s.d = 9*active + Math.floor(s.pump/4);
+        s.f = 27*active + Math.floor(s.pump/2);
+        s.cpuJump = active + Math.floor(s.pump/8);
+        s.cpuBias = s.quote>0.6 ? 'FORWARD' : 'REVERSE';
+        s.predict = (active>0 && s.quote>0.4) ? 'ACTIVE' : 'IDLE';
+
+        if (s.cpuJump>0) { this.memory.hits++; s.predictCount++; this.memory.slides.push(active); this.memory.jumps.push(s.cpuJump); }
+        else { this.memory.misses++; }
+        s.quote = (this.memory.hits+1)/(this.memory.hits+this.memory.misses+2);
+
+        const vals = [3,9,27,81,243,729];
+        const shift = (s.root + s.pump + s.cpuJump) % 6;
+        this.liveWindow = [
+            [vals[shift%6], vals[(shift+1)%6]],
+            [vals[(shift+2)%6], vals[(shift+3)%6]],
+            [vals[(shift+4)%6], vals[(shift+5)%6]]
+        ];
+        s.prefetchCount++;
+        if (s.tmp>0) s.cacheCount++;
+        this.render();
+        this.syncChess();
+    },
+
+    syncChess() {
+        const active = this.axles.filter(a=>a.active).length;
+        const s = this.state;
+        const strength = Math.min(5, 1 + Math.floor(active/2) + Math.floor(s.pump/25));
+        document.getElementById('strengthSlider').value = strength;
+        document.getElementById('strengthDisplay').textContent = strength;
+        const styleMap = { 'FORWARD':'aggressive', 'REVERSE':'defensive' };
+        const style = s.cpuBias === 'FORWARD' ? 'aggressive' : (s.quote>0.5 ? 'tactical' : 'random');
+        document.getElementById('styleSelect').value = style;
+        const speed = Math.max(200, 1500 - s.pump * 10);
+        document.getElementById('speedSlider').value = speed;
+        document.getElementById('speedDisplay').textContent = speed+'ms';
+        const moodMap = { 'ACTIVE':'neon', 'IDLE':'cool' };
+        if (window.atmo) atmo.setMood(moodMap[s.predict] || 'neon');
+    },
+
+    render() {
+        this.renderAxles();
+        this.renderLiveWindow();
+        this.updateStatus();
+        this.updateMystery();
+        this.updateCPU();
+        this.updateMetrics();
+        this.renderResult();
+    },
+
+    renderAxles() {
+        const grid = document.getElementById('axleGrid');
+        grid.innerHTML = '';
+        this.axles.forEach((a,i) => {
+            const cell = document.createElement('div');
+            cell.className = 'axle-cell' + (a.active ? ' on' : ' off');
+            cell.textContent = a.name.toUpperCase();
+            cell.onclick = () => this.toggleAxle(i);
+            grid.appendChild(cell);
+        });
+    },
+
+    renderLiveWindow() {
+        const grid = document.getElementById('liveWindow');
+        if (!grid) return;
+        grid.innerHTML = '';
+        this.liveWindow.forEach(row => row.forEach(val => {
+            const cell = document.createElement('div');
+            cell.className = 'cell gold';
+            cell.textContent = val;
+            cell.style.cssText = 'background:#2a1a0a;color:#ffd700;border-color:#ffd700;padding:4px;text-align:center;font-size:8px;border:1px solid #111;border-radius:3px;';
+            grid.appendChild(cell);
+        }));
+    },
+
+    updateStatus() {
+        document.getElementById('scoreVal').textContent = this.state.score;
+        document.getElementById('pumpVal').textContent = this.state.pump;
+        document.getElementById('quoteVal').textContent = Math.round(this.state.quote*100)+'%';
+        document.getElementById('predictVal').textContent = this.state.predict;
+    },
+
+    updateMystery() {
+        document.getElementById('qVal').textContent = this.state.q;
+        document.getElementById('dVal').textContent = this.state.d;
+        document.getElementById('fVal').textContent = this.state.f;
+        document.getElementById('rootVal').textContent = this.state.root;
+        document.getElementById('achseVal').textContent = this.state.achse;
+        document.getElementById('tmpVal').textContent = this.state.tmp;
+    },
+
+    updateCPU() {
+        document.getElementById('cpuStatus').textContent = this.state.predict==='ACTIVE'?'ACTIVE':'IDLE';
+        document.getElementById('cpuBias').textContent = this.state.cpuBias;
+        document.getElementById('cpuJump').textContent = this.state.cpuJump;
+    },
+
+    updateMetrics() {
+        document.getElementById('prefetchCount').textContent = this.state.prefetchCount;
+        document.getElementById('predictCount').textContent = this.state.predictCount;
+        document.getElementById('cacheCount').textContent = this.state.cacheCount;
+    },
+
+    renderResult() {
+        const el = document.getElementById('resultDisplay');
+        if (!el) return;
+        const active = this.axles.filter(a=>a.active).length;
+        const s = this.state;
+        el.textContent =
+`MASSNAHME · IKI1UC
+─────────────────
+aktive Achsen : ${active} / 9
+Pump-Stack    : ${s.pump} / 128
+Trefferquote  : ${Math.round(s.quote*100)}%
+Predict       : ${s.predict}
+Sprung        : ${s.cpuJump}
+Bias          : ${s.cpuBias}
+ROOT          : ${s.root}
+ACHSE         : ${s.achse}
+TMP           : ${s.tmp}
+Q:${s.q}  D:${s.d}  F:${s.f}
+PREFETCH:${s.prefetchCount}  PREDICT:${s.predictCount}  CACHE:${s.cacheCount}`;
+    },
+
+    toggleAxle(i) {
+        this.axles[i].active = !this.axles[i].active;
+        this.log(`achse ${this.axles[i].name} → ${this.axles[i].active ? 'ON' : 'OFF'}`, 'info');
+        this.sync();
+    },
+
+    pumpCycle() {
+        const active = this.axles.filter(a=>a.active).length;
+        if (active===0) { this.log('❗ keine achse aktiv — pump gestoppt','err'); return; }
+        this.stations.forEach((st,i) => {
+            if ((this.state.pump+i)%3===0) {
+                this.log(`🔷 STATION ${st} → BOOST`,'ok');
+                this.state.score += (active*(i+1));
+            }
+        });
+        this.state.pump = Math.min(this.state.pump+active, 128);
+        this.state.score += active*2;
+        this.log(`💨 PUMP · stack=${this.state.pump}`,'ok');
+        this.sync();
+    },
+
+    runGeneral() {
+        this.axles.forEach(a=>a.active=true);
+        for (let i=0; i<3; i++) { this.state.pump=Math.min(this.state.pump+9,128); this.state.score+=9*2; }
+        this.state.score+=50;
+        this.log('⚡ GENERAL RUN · alles aktiv · score+50','ok');
+        this.sync();
+    },
+
+    toggleAll() {
+        const allOn = this.axles.every(a=>a.active);
+        this.axles.forEach(a=>a.active=!allOn);
+        this.log(`🔄 ALL TOGGLE → ${allOn?'OFF':'ON'}`,'info');
+        this.sync();
+    },
+
+    randomize() {
+        this.axles.forEach(a=>a.active=Math.random()>0.5);
+        this.state.score = Math.floor(Math.random()*500)+500;
+        this.state.pump = Math.floor(Math.random()*30);
+        this.log('🎲 RANDOM · neuer zustand','warn');
+        this.sync();
+    },
+
+    loopAll() {
+        this.axles.forEach(a=>a.active=!a.active);
+        this.state.pump = Math.min(this.state.pump+this.axles.filter(a=>a.active).length, 128);
+        this.log('♾ LOOP-ALL · orbit complete','ok');
+        this.sync();
+    },
+
+    resetAll() {
+        this.axles.forEach(a=>a.active=false);
+        Object.assign(this.state, {
+            score:1000, pump:0, quote:0.5, predict:'IDLE', cpuJump:0,
+            cpuBias:'FORWARD', root:0, achse:'0', tmp:128, q:27, d:81, f:243,
+            prefetchCount:0, predictCount:0, cacheCount:0
+        });
+        this.memory = { hits:0, misses:0, slides:[], jumps:[] };
+        this.liveWindow = [['3','9'],['27','81'],['243','729']];
+        document.getElementById('consoleLog').innerHTML = '⏳ system zurückgesetzt...';
+        this.log('⟲ RESET · komplett neu','ok');
+        this.render();
+    },
+
+    init() {
+        this.log('⭐ 3‑STERNE · GENERAL · CHESS · ATMOSPHERIC','ok');
+        this.log('📊 vereinheitlichte sync()-Logik für alle Aktionen','info');
+        this.render();
+        setInterval(() => { if (this.axles.some(a=>a.active)) this.pumpCycle(); }, 8000);
+    }
+};
+
+// ================================================================
+// BAUSTEIN 2: SCHACHLOGIK (korrigiert)
+// ================================================================
+function inBounds(r,c){ return r>=0 && r<8 && c>=0 && c<8; }
+
+function getPseudoLegalMoves(board, r, c) {
+    const piece = board[r][c];
+    if (!piece) return [];
+    const moves = [];
+    const enemy = piece.color === 'white' ? 'black' : 'white';
+    const add = (nr,nc) => {
+        if (inBounds(nr,nc)) {
+            const target = board[nr][nc];
+            if (!target || target.color === enemy) moves.push({r:nr,c:nc});
+        }
+    };
+    switch(piece.type) {
+        case 'pawn': {
+            const dir = piece.color==='white'?-1:1;
+            if (inBounds(r+dir,c) && !board[r+dir][c]) moves.push({r:r+dir,c});
+            if ((piece.color==='white'&&r===6)||(piece.color==='black'&&r===1)) {
+                if (!board[r+dir][c] && !board[r+2*dir][c]) moves.push({r:r+2*dir,c});
+            }
+            for (const dc of [-1,1]) {
+                const nr=r+dir, nc=c+dc;
+                if (inBounds(nr,nc) && board[nr][nc] && board[nr][nc].color===enemy)
+                    moves.push({r:nr,c:nc});
+            }
+            break;
+        }
+        case 'rook': {
+            for (const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+                for (let i=1; i<8; i++) {
+                    const nr=r+dr*i, nc=c+dc*i;
+                    if (!inBounds(nr,nc)) break;
+                    const target=board[nr][nc];
+                    if (!target) moves.push({r:nr,c:nc});
+                    else { if (target.color===enemy) moves.push({r:nr,c:nc}); break; }
+                }
+            }
+            break;
+        }
+        case 'knight': {
+            for (const [dr,dc] of [[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]])
+                add(r+dr,c+dc);
+            break;
+        }
+        case 'bishop': {
+            for (const [dr,dc] of [[1,1],[1,-1],[-1,1],[-1,-1]]) {
+                for (let i=1; i<8; i++) {
+                    const nr=r+dr*i, nc=c+dc*i;
+                    if (!inBounds(nr,nc)) break;
+                    const target=board[nr][nc];
+                    if (!target) moves.push({r:nr,c:nc});
+                    else { if (target.color===enemy) moves.push({r:nr,c:nc}); break; }
+                }
+            }
+            break;
+        }
+        case 'queen': {
+            const rookMoves = getPseudoLegalMoves(board,r,c,{type:'rook',color:piece.color});
+            const bishopMoves = getPseudoLegalMoves(board,r,c,{type:'bishop',color:piece.color});
+            return [...rookMoves, ...bishopMoves];
+        }
+        case 'king': {
+            for (const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]])
+                add(r+dr,c+dc);
+            break;
+        }
+    }
+    return moves;
+}
+
+function isLegalMove(board, from, to, color) {
+    const piece = board[from.r][from.c];
+    if (!piece || piece.color !== color) return false;
+    const moves = getPseudoLegalMoves(board, from.r, from.c);
+    return moves.some(m => m.r === to.r && m.c === to.c);
+}
+
+function selectMoveByStyle(moves, style, strength) {
+    if (moves.length===0) return null;
+    if (style==='random') return moves[Math.floor(Math.random()*moves.length)];
+    const scored = moves.map(m => {
+        let score=0;
+        if (board[m.to.r][m.to.c] && board[m.to.r][m.to.c].color !== 'white') score += 10;
+        const centerDist = Math.abs(m.to.r-3.5) + Math.abs(m.to.c-3.5);
+        score += (7-centerDist)*0.5;
+        if (style==='aggressive') score += Math.random()*5;
+        if (style==='defensive') score += (7-m.to.r)*0.5;
+        if (style==='tactical') score += Math.random()*8 + (moves.length*0.1);
+        return {...m, score};
+    });
+    scored.sort((a,b)=>b.score-a.score);
+    const topN = Math.min(moves.length, Math.ceil(1+(5-strength)*0.5));
+    return scored[Math.floor(Math.random()*topN)];
+}
+
+// ================================================================
+// BAUSTEIN 3: CHESS BOARD & RENDER (korrigiert)
+// ================================================================
+let board = [];
+let currentColor = 'white';
+let currentGameMoves = [];
+let moveIndex = 0;
+let currentGame = null;
+let autoMode = false;
+let moveSpeed = 700;
+let animations = [];
+
+const canvas = document.getElementById('chessCanvas');
+const ctx = canvas.getContext('2d');
+const atmoCanvas = document.getElementById('atmoCanvas');
+const atmo = new AtmoBoard(atmoCanvas, 8);
+window.atmo = atmo;
+
+function initBoard() {
+    const backRankW = ['♖','♘','♗','♕','♔','♗','♘','♖'];
+    const backRankB = ['♜','♞','♝','♛','♚','♝','♞','♜'];
+    const types = ['rook','knight','bishop','queen','king','bishop','knight','rook'];
+    board = [];
+    for (let r=0; r<8; r++) {
+        const row = [];
+        for (let c=0; c<8; c++) {
+            let piece=null, color=null, type=null;
+            if (r===0) { piece=backRankW[c]; color='white'; type=types[c]; }
+            else if (r===1) { piece='♟'; color='white'; type='pawn'; }
+            else if (r===6) { piece='♟'; color='black'; type='pawn'; }
+            else if (r===7) { piece=backRankB[c]; color='black'; type=types[c]; }
+            row.push({ piece, color, type });
+        }
+        board.push(row);
+    }
+    currentColor = 'white';
+}
+
+function resizeCanvases() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const s = Math.min(rect.width, rect.height, 320);
+    canvas.width = s;
+    canvas.height = s;
+    atmo.resize(s, s);
+    renderBoard();
+}
+window.addEventListener('resize', resizeCanvases);
+
+function renderBoard() {
+    const w=canvas.width, h=canvas.height, cs=w/8;
+    ctx.clearRect(0,0,w,h);
+    for (let r=0; r<8; r++) {
+        for (let c=0; c<8; c++) {
+            const x=c*cs, y=r*cs;
+            const p = board[r][c];
+            if (p && p.piece) {
+                ctx.font = `${cs*0.6}px 'Segoe UI','Arial Unicode MS',sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'rgba(100,200,180,0.02)';
+                ctx.shadowBlur = 6;
+                ctx.fillStyle = p.color==='white'?'#ddeeee':'#1a2a2a';
+                ctx.fillText(p.piece, x+cs/2, y+cs/2+2);
+                ctx.shadowBlur = 0;
+            }
+        }
+    }
+}
+
+function animateMove(from, to, piece, callback) {
+    const cs = canvas.width/8;
+    const startX = from.c*cs + cs/2;
+    const startY = from.r*cs + cs/2;
+    const endX = to.c*cs + cs/2;
+    const endY = to.r*cs + cs/2;
+    const startTime = performance.now();
+
+    // Partikel-Burst
+    const cx=(startX+endX)/2, cy=(startY+endY)/2;
+    for (let i=0; i<15; i++) {
+        const angle = Math.random()*Math.PI*2;
+        const speed = 0.5+Math.random()*2;
+        atmo.particles.push({
+            x:cx, y:cy,
+            vx:Math.cos(angle)*speed,
+            vy:Math.sin(angle)*speed,
+            life:1,
+            size:2+Math.random()*3,
+            color:`rgba(255,215,0,${0.3+Math.random()*0.5})`
+        });
+    }
+
+    animations.push({ piece, from, to, startX, startY, endX, endY, startTime, duration:moveSpeed, callback });
+    if (animations.length===1) renderLoop();
+}
+
+function renderLoop() {
+    const now = performance.now();
+    const cs = canvas.width/8;
+    renderBoard();
+
+    animations = animations.filter(anim => {
+        const p = Math.min((now-anim.startTime)/anim.duration, 1);
+        const x = anim.startX + (anim.endX-anim.startX)*p;
+        const y = anim.startY + (anim.endY-anim.startY)*p;
+        ctx.font = `${cs*0.6}px 'Segoe UI','Arial Unicode MS',sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(255,215,0,0.3)';
+        ctx.shadowBlur = 16;
+        ctx.fillStyle = anim.piece.color==='white'?'#ddeeee':'#1a2a2a';
+        ctx.fillText(anim.piece.piece, x, y+2);
+        ctx.shadowBlur = 0;
+        if (p>=1) {
+            board[anim.to.r][anim.to.c] = anim.piece;
+            board[anim.from.r][anim.from.c] = { piece:null, color:null, type:null };
+            if (anim.callback) anim.callback();
+            return false;
+        }
+        return true;
+    });
+
+    if (animations.length>0) requestAnimationFrame(renderLoop);
+    else updateUI();
+}
+
+// ================================================================
+// BAUSTEIN 4: CHESS GAME DATA & CONTROL (korrigiert)
+// ================================================================
+function generateGames(n) {
+    const g = [];
+    const names = ['Unsterbliche','Opernpartie','Evergreen','Match des Jahrhunderts',
+        'Kasparov vs. Deep Blue','Unsterbliche Remis','Schäferzug','Läufer-Coup',
+        'Pferde-Tour','Opfer von Anderssen','Remis-Partie','Königsangriff',
+        'Damen-Oper','Turm-Sprung','Bauern-Welle','Verteidigung von Berlin'];
+    const themes = ['pferd','opfer','remis','laufer','schafer','könig','dame','turm','bauer'];
+    const emotions = ['😱','🎭','🌿','❄️','🤖','⚖️','🐴','♝','🐑','💥'];
+    for (let i=0; i<n; i++) {
+        const year = 1800+Math.floor(Math.random()*200);
+        const name = names[i%names.length]+(i>15?` (${i+1})`:'');
+        const theme = themes[i%themes.length];
+        const moves = [];
+        for (let j=0; j<12+Math.floor(Math.random()*25); j++) {
+            const from = String.fromCharCode(97+Math.floor(Math.random()*8))+(1+Math.floor(Math.random()*8));
+            const to = String.fromCharCode(97+Math.floor(Math.random()*8))+(1+Math.floor(Math.random()*8));
+            const piece = ['♟','♞','♝','♜','♛','♚'][Math.floor(Math.random()*6)];
+            moves.push({
+                piece: piece,
+                from: from,
+                to: to,
+                notation: `${from}→${to}`,
+                type: ['pawn','knight','bishop','rook','queen','king'][['♟','♞','♝','♜','♛','♚'].indexOf(piece)],
+                color: j%2===0 ? 'white' : 'black'
+            });
+        }
+        const winner = ['Weiß','Schwarz','Remis'][Math.floor(Math.random()*3)];
+        g.push({ id:i, name, year, theme, moves, winner, emotion: emotions[i%emotions.length], players:`Meister ${i+1} vs. ${i+2}` });
+    }
+    return g;
+}
+
+let allGames = generateGames(30);
+let filtered = [...allGames];
+
+function loadGame(game) {
+    initBoard();
+    currentGameMoves = game.moves.slice();
+    moveIndex = 0;
+    currentGame = game;
+    document.getElementById('totalMoves').textContent = game.moves.length;
+    document.getElementById('moveCount').textContent = '0';
+    document.getElementById('turnIndicator').textContent = 'Weiß';
+    document.getElementById('manaIndicator').textContent = '0';
+    renderBoard();
+}
+
+function playNextMove() {
+    if (!currentGame || moveIndex >= currentGameMoves.length) {
+        if (autoMode) stopAuto();
+        return;
+    }
+    const m = currentGameMoves[moveIndex];
+    // Suche nach Typ + Farbe (NICHT nach Unicode)
+    let from=null, piece=null;
+    const color = moveIndex % 2 === 0 ? 'white' : 'black';
+    for (let r=0; r<8; r++) {
+        for (let c=0; c<8; c++) {
+            const p = board[r][c];
+            if (p && p.type === m.type && p.color === m.color) {
+                from={r,c};
+                piece=p;
+                break;
+            }
+        }
+        if (from) break;
+    }
+    // Fallback: suche nach Unicode (nur falls Typ nicht passt)
+    if (!from) {
+        for (let r=0; r<8; r++) {
+            for (let c=0; c<8; c++) {
+                if (board[r][c] && board[r][c].piece === m.piece) {
+                    from={r,c}; piece=board[r][c];
+                    break;
+                }
+            }
+            if (from) break;
+        }
+    }
+    if (from && piece) {
+        // Korrekte Koordinatenberechnung
+        const to = {
+            r: 8 - parseInt(m.to[1]),
+            c: m.to.charCodeAt(0) - 97
+        };
+        if (inBounds(to.r, to.c)) {
+            animateMove(from, to, piece, () => {
+                moveIndex++;
+                document.getElementById('moveCount').textContent = moveIndex;
+                document.getElementById('turnIndicator').textContent = moveIndex%2===0?'Weiß':'Schwarz';
+                document.getElementById('manaIndicator').textContent = moveIndex;
+                if (autoMode && moveIndex < currentGameMoves.length) setTimeout(playNextMove, moveSpeed);
+                else if (autoMode && moveIndex >= currentGameMoves.length) stopAuto();
+            });
+        } else {
+            moveIndex++;
+            setTimeout(playNextMove, 100);
+        }
+    } else {
+        moveIndex++;
+        setTimeout(playNextMove, 100);
+    }
+}
+
+function stopAuto() { autoMode=false; document.getElementById('btnAuto').textContent='▶ Auto'; }
+
+// ================================================================
+// BAUSTEIN 5: UI UPDATE & EVENTS
+// ================================================================
+function updateUI() {}
+
+document.addEventListener('DOMContentLoaded', () => {
+    resizeCanvases();
+    setTimeout(resizeCanvases, 150);
+    initBoard();
+    if (allGames.length) loadGame(allGames[0]);
+    atmo.setMood('neon');
+    atmo.start();
+
+    // General Engine initialisieren
+    engine.init();
+    window.engine = engine;
+
+    // General Buttons
+    document.getElementById('btnGeneral').addEventListener('click', ()=>engine.runGeneral());
+    document.getElementById('btnReset').addEventListener('click', ()=>engine.resetAll());
+    document.getElementById('btnToggleAll').addEventListener('click', ()=>engine.toggleAll());
+    document.getElementById('btnRandom').addEventListener('click', ()=>engine.randomize());
+    document.getElementById('btnPump').addEventListener('click', ()=>engine.pumpCycle());
+    document.getElementById('btnLoop').addEventListener('click', ()=>engine.loopAll());
+
+    // Chess Buttons
+    document.getElementById('btnStep').addEventListener('click', playNextMove);
+    document.getElementById('btnAuto').addEventListener('click', () => {
+        if (autoMode) { stopAuto(); return; }
+        if (!currentGame) { if (filtered.length) { currentGame=filtered[0]; loadGame(currentGame); } else return; }
+        autoMode=true;
+        document.getElementById('btnAuto').textContent='⏸ Stop';
+        if (moveIndex===0) playNextMove();
+        else if (moveIndex < currentGameMoves.length) playNextMove();
+        else { stopAuto(); }
+    });
+    document.getElementById('btnResetBoard').addEventListener('click', () => { stopAuto(); initBoard(); renderBoard(); });
+
+    // Speed
+    document.getElementById('speedSlider').addEventListener('input', function() {
+        moveSpeed = parseInt(this.value);
+        document.getElementById('speedDisplay').textContent = moveSpeed+'ms';
+    });
+
+    // Style -> Mood
+    document.getElementById('styleSelect').addEventListener('change', function() {
+        const moodMap = { random:'neon', aggressive:'warm', defensive:'cool', tactical:'golden' };
+        atmo.setMood(moodMap[this.value] || 'neon');
+    });
+
+    // Strength
+    document.getElementById('strengthSlider').addEventListener('input', function() {
+        document.getElementById('strengthDisplay').textContent = this.value;
+    });
+
+    // Effects
+    const effects = {
+        btnIce: { type:'ice', msg:'❄️ ICE · kühle Präzision' },
+        btnWater: { type:'water', msg:'💧 WATER · fließende Bewegung' },
+        btnFire: { type:'fire', msg:'🔥 FIRE · brennender Impuls' }
+    };
+    for (const [id, data] of Object.entries(effects)) {
+        document.getElementById(id).addEventListener('click', () => {
+            const rect = canvas.getBoundingClientRect();
+            spawnEffect(rect.left+rect.width/2, rect.top+rect.height/2, data.type);
+        });
+    }
+
+    // Tastatur
+    document.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); playNextMove(); }
+        if (e.key === 'r' || e.key === 'R') document.getElementById('btnResetBoard').click();
+        if (e.key === 'a' || e.key === 'A') document.getElementById('btnAuto').click();
+        if (e.key === 'g' || e.key === 'G') document.getElementById('btnGeneral').click();
+    });
+});
+
+function spawnEffect(x,y,type) {
+    const el = document.createElement('div');
+    const symbols = { ice:'❄️', water:'💧', fire:'🔥' };
+    el.textContent = symbols[type] || '✨';
+    el.style.cssText = `
+        position:fixed; pointer-events:none; font-size:32px; z-index:9999;
+        left:${x-16}px; top:${y-16}px; opacity:0.8;
+        animation: floatUp 0.8s ease-out forwards;
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+}
+
+console.log('⭐ 3‑STERNE · GENERAL · CHESS · ATMOSPHERIC geladen');
+console.log('⌨️  Leertaste=Nächster Zug  r=Reset  a=Auto  g=General Run');
+</script>
+</body>
+</html>
